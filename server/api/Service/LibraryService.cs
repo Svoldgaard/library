@@ -1,38 +1,63 @@
-
-
+using System.ComponentModel.DataAnnotations;
 using api.DTOS.Request;
+using efscaffold.Entities;
 using Infrastructure.Postgres.Scaffolding;
+using Microsoft.EntityFrameworkCore;
 
 public class LibraryService(MyDbContext ctx) : ILibraryService
 {
-    public async Task<List<BookDto>> GetBooks()
+    public Task<List<BookDto>> GetBooks()
     {
-        return NotImplementedException;
+        return ctx.Books.Select(b => new BookDto(b)).ToListAsync();
     }
 
-    public async Task<List<AuthorDto>> GetAuthors()
+    public Task<List<AuthorDto>> GetAuthors()
     {
-        return NotImplementedException;
+        return ctx.Authors.Select(a => new AuthorDto(a)).ToListAsync();
     }
 
-    public async Task<List<GenreDto>> GetGenres()
+    public Task<List<GenreDto>> GetGenres()
     {
-        return NotImplementedException;
+        return ctx.Genres.Select(g => new GenreDto(g)).ToListAsync();
     }
 
-    public async Task<List<BookDto>> CreateBook(CreateBookDtoRequest dto)
+    public async Task<BookDto> CreateBook(CreateBookDtoRequest dto)
     {
-        return NotImplementedException;
+        Validator.ValidateObject(dto, new ValidationContext(dto), true);
+
+        var book = new Book()
+        {
+            Pages = dto.Pages,
+            Createdat = DateTime.UtcNow,
+            Id = Guid.NewGuid().ToString(),
+            Title = dto.Title
+        };
+         ctx.Books.Add(book);
+         await ctx.SaveChangesAsync();
+         return new BookDto(book);
+         
     }
 
-    public async Task<List<BookDto>> UpdateBook(UpdateBookDtoRequest dto)
+    public async Task<BookDto> UpdateBook(UpdateBookDtoRequest dto)
     {
-        return NotImplementedException;
+        Validator.ValidateObject(dto, new ValidationContext(dto), true);
+        var book = ctx.Books.First(b => b.Id == dto.BookId);
+        var genre = ctx.Genres.First(g => g.Id == dto.GenreId);
+        book.Genre = genre;
+        book.Pages = dto.Pages;
+        book.Title = dto.Title;
+        book.Authors = dto.AuthorsIds.Select(id => ctx.Authors.First(a => a.Id == id)).ToList();
+        ctx.Books.Update(book);
+        await ctx.SaveChangesAsync();
+        return new BookDto(book);
     }
 
-    public async Task<BookDto> DeleteBook(string id)
+    public async Task<BookDto> DeleteBook(string bookId)
     {
-        return NotImplementedException;
+        var book = ctx.Books.First(b => b.Id == bookId);
+        ctx.Books.Remove(book);
+        await ctx.SaveChangesAsync();
+        return new BookDto(book);
     }
 
 }
