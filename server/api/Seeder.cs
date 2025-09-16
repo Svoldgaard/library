@@ -1,8 +1,5 @@
-using dataccess;
 using efscaffold.Entities;
 using Infrastructure.Postgres.Scaffolding;
-
-namespace api.Etc;
 
 public class Seeder(MyDbContext ctx) : ISeeder
 {

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace efscaffold.Entities;
+﻿
+using efscaffold.Entities;
 
 public partial class Author
 {
