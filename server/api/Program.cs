@@ -26,7 +26,9 @@ public class Program
         {
             options.AddPolicy("AllowClient", policy =>
             {
-                policy.WithOrigins("https://libraryclient.fly.dev") // 👈 your frontend domain
+                policy.WithOrigins(
+                        "http://localhost:5173",
+                        "https://libraryclient.fly.dev") // 👈 your frontend domain
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
@@ -65,17 +67,17 @@ public class Program
         app.UseAuthorization();
         app.MapControllers();
         app.GenerateApiClientsFromOpenApi("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
-        if (app.Environment.IsDevelopment())
-        {
-            using (var scope = app.Services.CreateScope())
-            {
-                var seeder = scope.ServiceProvider.GetService<ISeeder>();
-                if (seeder != null)
-                {
-                    seeder.Seed();
-                }
-            }
-        }
+        //if (app.Environment.IsDevelopment())
+        //{
+        //    using (var scope = app.Services.CreateScope())
+        //    {
+        //        var seeder = scope.ServiceProvider.GetService<ISeeder>();
+        //        if (seeder != null)
+        //        {
+        //            seeder.Seed();
+        //        }
+        //    }
+        //}
 
         app.Run();
 

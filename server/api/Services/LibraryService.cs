@@ -8,7 +8,11 @@ public class LibraryService(MyDbContext ctx) : ILibraryService
 {
     public Task<List<BookDto>> GetBooks()
     {
-        return ctx.Books.Select(b => new BookDto(b)).ToListAsync();
+        return ctx.Books
+            .Include(b => b.Authors) // load authors
+            .Include(b => b.Genre)   // load genre
+            .Select(b => new BookDto(b))
+            .ToListAsync();
     }
 
     public Task<List<AuthorDto>> GetAuthors()
