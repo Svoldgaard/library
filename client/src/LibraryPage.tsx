@@ -2,6 +2,7 @@ import './App.css'
 import { useEffect, useState } from "react";
 import { type AuthorDto, type BookDto, type GenreDto } from "./generated-client.ts";
 import { libraryApi } from "./BaseUrl.ts";
+import {useNavigate} from "react-router-dom";
 
 interface BookRow {
     book: BookDto;
@@ -14,6 +15,8 @@ function LibraryPage() {
     const [books, setBooks] = useState<BookDto[]>([]);
     const [rows, setRows] = useState<BookRow[]>([]);
     const [selectedBookIds, setSelectedBookIds] = useState<Set<string>>(new Set());
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,8 +52,12 @@ function LibraryPage() {
     };
 
     const handleUpdate = () => {
-        console.log("Selected books for update:", Array.from(selectedBookIds));
-        // Call PUT /UpdateBook with the selected books
+        if(selectedBookIds.size === 1) {
+            const id = Array.from(selectedBookIds)[0]
+            navigate(`/edit/${id}`)
+        }else{
+            alert("Please select exactly one book to update")
+        }
     };
 
     const handleDelete = () => {
