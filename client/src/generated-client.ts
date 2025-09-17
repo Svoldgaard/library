@@ -153,7 +153,16 @@ export class LibraryClient {
         return Promise.resolve<BookDto>(null as any);
     }
 
-    updateBook(dto: UpdateBookDtoRequest): Promise<BookDto> {
+    updateBook(id: string, p0: {
+        title: string;
+        authorsIds: string[];
+        genreId: string | null;
+        id: string;
+        pages: number;
+        createdat: string | undefined;
+        genreid: string | undefined;
+        genre: GenreDto | undefined
+    }): Promise<BookDto> {
         let url_ = this.baseUrl + "/UpdateBook";
         url_ = url_.replace(/[?&]$/, "");
 
