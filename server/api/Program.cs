@@ -13,6 +13,13 @@ public class Program
             var configuration = provider.GetRequiredService<IConfiguration>();
             var appOptions = new AppOptions();
             configuration.GetSection(nameof(AppOptions)).Bind(appOptions);
+            
+            var dbConn = Environment.GetEnvironmentVariable("DB_CONNECTION");
+            if (!string.IsNullOrEmpty(dbConn))
+            {
+                appOptions.Db = dbConn;
+            }
+
             return appOptions;
         });
         services.AddDbContext<MyDbContext>((services, options) =>
@@ -28,7 +35,7 @@ public class Program
             {
                 policy.WithOrigins(
                         "http://localhost:5174",
-                        "https://libraryclient.fly.dev") // 👈 your frontend domain
+                        "https://libraryclient.fly.dev") 
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
@@ -62,23 +69,10 @@ public class Program
         app.UseOpenApi();
         app.UseSwaggerUi();
         app.UseRouting();
-        //app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().SetIsOriginAllowed(x => true));
         app.UseCors("AllowClient");
         app.UseAuthorization();
         app.MapControllers();
         app.GenerateApiClientsFromOpenApi("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
-        //if (app.Environment.IsDevelopment())
-        //{
-        //    using (var scope = app.Services.CreateScope())
-        //    {
-        //        var seeder = scope.ServiceProvider.GetService<ISeeder>();
-        //        if (seeder != null)
-        //        {
-        //            seeder.Seed();
-        //        }
-        //    }
-        //}
-
         app.Run();
 
     }
