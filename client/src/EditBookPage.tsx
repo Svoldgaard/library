@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { type BookDto, type AuthorDto, type GenreDto } from "./generated-client.ts";
+import { type BookDto, type AuthorDto, type GenreDto, type UpdateBookDtoRequest } from "./generated-client.ts";
 import { libraryApi } from "./BaseUrl.ts";
 
 function EditBookPage() {
@@ -25,13 +25,13 @@ function EditBookPage() {
                     libraryApi.getGenres(),
                 ]);
 
-                if (!bookRes || bookRes.length === 0) return;
-                const singleBook = bookRes[0]; // pick first book
-                setBook(singleBook);
-                setTitle(singleBook.title);
-                setSelectedAuthors(singleBook.authorsIds ?? []);
-                setSelectedGenre(singleBook.genre?.id ?? null);
+                const found = (bookRes ?? []).find(b => String(b.id) === String(bookId));
+                if (!found) return;
 
+                setBook(found);
+                setTitle(found.title);
+                setSelectedAuthors(found.authorsIds ?? []);
+                setSelectedGenre(found.genre?.id ?? null);
                 setAuthors(authorsRes ?? []);
                 setGenres(genresRes ?? []);
             } catch (err) {
@@ -45,14 +45,17 @@ function EditBookPage() {
     const handleSave = async () => {
         if (!book) return;
 
+        const payload: UpdateBookDtoRequest = {
+            bookId: book.id,
+            pages: book.pages ?? 0,
+            title,
+            authorsIds: selectedAuthors,
+            genreId: selectedGenre ?? ""
+        };
+
         try {
-            await libraryApi.updateBook(book.id, {
-                ...book,
-                title,
-                authorsIds: selectedAuthors,
-                genreId: selectedGenre,
-            });
-            navigate("/"); // go back to library page
+            await libraryApi.updateBook(payload);
+            navigate("/");
         } catch (err) {
             console.error("Error updating book", err);
         }
@@ -61,48 +64,54 @@ function EditBookPage() {
     if (!book) return <div>Loading...</div>;
 
     return (
-        <div className="edit-book-container">
-            <h1>Edit Book</h1>
+        <div className="app-container">
+            <div className="library-card">
+                <h1>Edit Book</h1>
 
-            <div>
-                <label>Title:</label>
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
+                <div className="details-panel">
+                    <div className="form-row">
+                        <label>Title:</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <label>Authors:</label>
+                        <select
+                            multiple
+                            value={selectedAuthors}
+                            onChange={(e) =>
+                                setSelectedAuthors(Array.from(e.target.selectedOptions, o => o.value))
+                            }
+                        >
+                            {authors.map(a => (
+                                <option key={a.id} value={a.id}>{a.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="form-row">
+                        <label>Genre:</label>
+                        <select
+                            value={selectedGenre ?? ""}
+                            onChange={(e) => setSelectedGenre(e.target.value)}
+                        >
+                            <option value="">-- Select Genre --</option>
+                            {genres.map(g => (
+                                <option key={g.id} value={g.id}>{g.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="action-buttons">
+                        <button className="button" onClick={handleSave}>Save</button>
+                        <button className="button" onClick={() => navigate("/")}>Cancel</button>
+                    </div>
+                </div>
             </div>
-
-            <div>
-                <label>Authors:</label>
-                <select
-                    multiple
-                    value={selectedAuthors}
-                    onChange={(e) =>
-                        setSelectedAuthors(Array.from(e.target.selectedOptions, o => o.value))
-                    }
-                >
-                    {authors.map(a => (
-                        <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                </select>
-            </div>
-
-            <div>
-                <label>Genre:</label>
-                <select
-                    value={selectedGenre ?? ""}
-                    onChange={(e) => setSelectedGenre(e.target.value)}
-                >
-                    <option value="">-- Select Genre --</option>
-                    {genres.map(g => (
-                        <option key={g.id} value={g.id}>{g.name}</option>
-                    ))}
-                </select>
-            </div>
-
-            <button onClick={handleSave}>Save</button>
-            <button onClick={() => navigate("/")}>Cancel</button>
         </div>
     );
 }

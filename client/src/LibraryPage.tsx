@@ -2,7 +2,7 @@ import './App.css'
 import { useEffect, useState } from "react";
 import { type AuthorDto, type BookDto, type GenreDto } from "./generated-client.ts";
 import { libraryApi } from "./BaseUrl.ts";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 interface BookRow {
     book: BookDto;
@@ -14,9 +14,10 @@ function LibraryPage() {
     const [authors, setAuthors] = useState<AuthorDto[]>([]);
     const [books, setBooks] = useState<BookDto[]>([]);
     const [rows, setRows] = useState<BookRow[]>([]);
-    const [selectedBookIds, setSelectedBookIds] = useState<Set<string>>(new Set());
-
+    const [selectedBook, setSelectedBook] = useState<BookRow | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,83 +45,104 @@ function LibraryPage() {
         fetchData();
     }, []);
 
-    const toggleSelect = (bookId: string) => {
-        const newSet = new Set(selectedBookIds);
-        if (newSet.has(bookId)) newSet.delete(bookId);
-        else newSet.add(bookId);
-        setSelectedBookIds(newSet);
-    };
+
+
 
     const handleUpdate = () => {
-        if(selectedBookIds.size === 1) {
-            const id = Array.from(selectedBookIds)[0]
-            navigate(`/edit/${id}`)
+        if(selectedBook) {
+            navigate(`/edit/${selectedBook.book.id}`)
+            console.log("Selected book for update:", selectedBook.book.id);
         }else{
             alert("Please select exactly one book to update")
         }
     };
 
-    const handleDelete = () => {
-        console.log("Selected books for delete:", selectedBookIds);
-    }
+    const handleDelete = async () => {
+        if (selectedBook) {
+            const confirmed = window.confirm(`Delete "${selectedBook.book.title}"?`);
+            if (!confirmed) return;
 
-    const handelSearch = () => {
-        console.log("Selected books for search:", selectedBookIds);
-    }
+            try {
+                await libraryApi.deleteBook(selectedBook.book.id);
+                setRows(rows.filter(r => r.book.id !== selectedBook.book.id));
+                setSelectedBook(null);
+            } catch (err) {
+                console.error("Delete failed", err);
+            }
+        } else {
+            alert("Please select a book first");
+        }
+    };
+
+    const filteredRows = rows.filter(row =>
+        row.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.authors.some(a => a.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        row.genre?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleRowClick = (row: BookRow) => {
+        setSelectedBook(row);
+        console.log("Selected book:", row.book.id);
+    };
+
 
     return (
         <div className="app-container">
             <div className="library-card">
                 <h1>Library</h1>
 
-                <div>
-                    <input type="text"/>
-                    <button className="button" onClick={handelSearch}>Search</button>
+                {/* Search Bar */}
+                <div className="search-bar">
+                    <input type="text"
+                           placeholder="Search books..."
+                           value={searchTerm}
+                           onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+
                 </div>
 
-                <div>
-                    <button className="button" onClick={handleUpdate}>
-                        Update
-                    </button>
+                <div className="content-container">
+                    {/* LEFT SIDE - TABLE */}
+                    <div className="table-container">
+                        <table className="library-table">
+                            <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Authors</th>
+                                <th>Genre</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {filteredRows.map(row => (
+                                <tr
+                                    key={row.book.id}
+                                    className={selectedBook?.book.id === row.book.id ? "selected" : ""}
+                                    onClick={() => handleRowClick(row)}
+                                >
+                                    <td>{row.book.title}</td>
+                                    <td>{row.authors.map(a => a.name).join(", ")}</td>
+                                    <td>{row.genre?.name || "Unknown"}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <button className="button" onClick={handleDelete}>Delete</button>
+                    {/* RIGHT SIDE - DETAILS PANEL */}
+                    {selectedBook && (
+                        <div className="details-panel">
+                            <div className="book-placeholder">📘</div>
+                            <h2>{selectedBook.book.title}</h2>
+                            <p><strong>Authors:</strong> {selectedBook.authors.map(a => a.name).join(", ")}</p>
+                            <p><strong>Genre:</strong> {selectedBook.genre?.name || "Unknown"}</p>
+
+                            <div className="action-buttons">
+                                <button className="button" onClick={handleUpdate}>Update</button>
+                                <button className="button" onClick={handleDelete}>Delete</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-
-
-
-                <table className="library-table">
-                    <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Book</th>
-                        <th>Authors</th>
-                        <th>Genre</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {rows.map(row => (
-                        <tr
-                            key={row.book.id}
-                            className={selectedBookIds.has(row.book.id) ? "selected" : ""}
-                        >
-                            <td className="text-center">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedBookIds.has(row.book.id)}
-                                    onChange={() => toggleSelect(row.book.id)}
-                                />
-                            </td>
-                            <td>{row.book.title}</td>
-                            <td>{row.authors.map(a => a.name).join(", ")}</td>
-                            <td>{row.genre?.name || "Unknown"}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-
-                <button className="update-button" onClick={handleUpdate}>
-                    Update Selected
-                </button>
             </div>
         </div>
     );
