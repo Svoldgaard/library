@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyProject.Tests", "tests\MyProject.Tests.csproj", "{AD282365-A58A-4553-A19A-C2A0CBAB4777}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests.csproj", "{C5798889-766C-4396-AA48-78A2CD971349}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,11 +59,24 @@ Global
 		{AD282365-A58A-4553-A19A-C2A0CBAB4777}.Release|x64.Build.0 = Release|Any CPU
 		{AD282365-A58A-4553-A19A-C2A0CBAB4777}.Release|x86.ActiveCfg = Release|Any CPU
 		{AD282365-A58A-4553-A19A-C2A0CBAB4777}.Release|x86.Build.0 = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|x64.Build.0 = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Debug|x86.Build.0 = Debug|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|x64.ActiveCfg = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|x64.Build.0 = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|x86.ActiveCfg = Release|Any CPU
+		{C5798889-766C-4396-AA48-78A2CD971349}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AD282365-A58A-4553-A19A-C2A0CBAB4777} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{C5798889-766C-4396-AA48-78A2CD971349} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
