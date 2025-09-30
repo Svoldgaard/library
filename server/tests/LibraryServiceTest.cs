@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Server.api.DTOS.Request;
+using api;
+using api.DTOS.Request;
 using Infrastructure.Postgres.Scaffolding;
 using Xunit;
 
