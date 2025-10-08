@@ -6,6 +6,65 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/GetBooks": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "Library_GetBooks",
+        "parameters": [
+          {
+            "name": "Skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "Take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          },
+          {
+            "name": "Ordering",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/BookOrderingOptions"
+            },
+            "x-position": 3
+          },
+          {
+            "name": "Descending",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/GetAuthors": {
       "get": {
         "tags": [
@@ -21,29 +80,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/AuthorDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GetBooks": {
-      "get": {
-        "tags": [
-          "Library"
-        ],
-        "operationId": "Library_GetBooks",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -172,6 +208,119 @@
   },
   "components": {
     "schemas": {
+      "Book": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "genreid": {
+            "type": "string",
+            "nullable": true
+          },
+          "genre": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Genre"
+              }
+            ]
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Author"
+            }
+          }
+        }
+      },
+      "Genre": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            }
+          }
+        }
+      },
+      "Author": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Book"
+            }
+          }
+        }
+      },
+      "BookOrderingOptions": {
+        "type": "integer",
+        "description": "",
+        "x-enum-names": [
+          "Name",
+          "NumberOfBooksPublished"
+        ],
+        "x-enum-varnames": [
+          "Name",
+          "NumberOfBooksPublished"
+        ],
+        "x-enumNames": [
+          "Name",
+          "NumberOfBooksPublished"
+        ],
+        "x-enum-descriptions": [
+          null,
+          null
+        ],
+        "x-enumDescriptions": [
+          null,
+          null
+        ],
+        "enum": [
+          0,
+          1
+        ]
+      },
       "AuthorDto": {
         "type": "object",
         "additionalProperties": false,

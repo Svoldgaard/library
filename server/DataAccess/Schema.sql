@@ -22,7 +22,7 @@ create table library.book
     pages     int              not null,
     createdAt timestamp with time zone,
     genreId   text             references library.genre (id) on delete set null
-); 
+);
 
 create table library.authorbookjunction
 (

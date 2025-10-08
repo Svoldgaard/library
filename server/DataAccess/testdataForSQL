@@ -1,0 +1,175 @@
+-- Drop and recreate schema
+drop schema if exists library cascade;
+create schema if not exists library;
+
+-- Create tables
+create table library.author
+(
+    id        text primary key not null,
+    name      text             not null,
+    createdAt timestamp with time zone
+);
+
+create table library.genre
+(
+    id        text primary key not null,
+    name      text             not null,
+    createdAt timestamp with time zone
+);
+
+create table library.book
+(
+    id        text primary key not null,
+    title     text             not null,
+    pages     int              not null,
+    createdAt timestamp with time zone,
+    genreId   text             references library.genre (id) on delete set null
+);
+
+create table library.authorbookjunction
+(
+    authorId text references library.author (id) on delete cascade,
+    bookId   text references library.book (id) on delete cascade,
+    primary key (authorId, bookId)
+);
+
+-- ============================================
+-- Insert Data
+-- ============================================
+
+-- Genres
+insert into library.genre (id, name, createdAt) values
+('g1', 'Science Fiction', now()),
+('g2', 'Fantasy', now()),
+('g3', 'Mystery', now()),
+('g4', 'Romance', now()),
+('g5', 'Historical Fiction', now()),
+('g6', 'Thriller', now()),
+('g7', 'Horror', now()),
+('g8', 'Non-Fiction', now()),
+('g9', 'Biography', now()),
+('g10', 'Philosophy', now());
+
+-- Authors
+insert into library.author (id, name, createdAt) values
+('a1', 'Isaac Asimov', now()),
+('a2', 'J.K. Rowling', now()),
+('a3', 'Agatha Christie', now()),
+('a4', 'George Orwell', now()),
+('a5', 'Jane Austen', now()),
+('a6', 'Stephen King', now()),
+('a7', 'Ernest Hemingway', now()),
+('a8', 'J.R.R. Tolkien', now()),
+('a9', 'Neil Gaiman', now()),
+('a10', 'Margaret Atwood', now()),
+('a11', 'Arthur C. Clarke', now()),
+('a12', 'Dan Brown', now()),
+('a13', 'Suzanne Collins', now()),
+('a14', 'C.S. Lewis', now()),
+('a15', 'Haruki Murakami', now());
+
+-- Books
+insert into library.book (id, title, pages, createdAt, genreId) values
+('b1', 'Foundation', 255, now(), 'g1'),
+('b2', 'Harry Potter and the Sorcerer''s Stone', 320, now(), 'g2'),
+('b3', 'Murder on the Orient Express', 256, now(), 'g3'),
+('b4', '1984', 328, now(), 'g1'),
+('b5', 'Pride and Prejudice', 279, now(), 'g4'),
+('b6', 'The Shining', 447, now(), 'g7'),
+('b7', 'The Old Man and the Sea', 127, now(), 'g5'),
+('b8', 'The Hobbit', 310, now(), 'g2'),
+('b9', 'American Gods', 465, now(), 'g2'),
+('b10', 'The Handmaid''s Tale', 324, now(), 'g4'),
+('b11', 'Childhood’s End', 300, now(), 'g1'),
+('b12', 'Angels & Demons', 480, now(), 'g6'),
+('b13', 'The Da Vinci Code', 489, now(), 'g6'),
+('b14', 'The Hunger Games', 374, now(), 'g2'),
+('b15', 'Catching Fire', 391, now(), 'g2'),
+('b16', 'Mockingjay', 390, now(), 'g2'),
+('b17', 'The Lion, the Witch and the Wardrobe', 208, now(), 'g2'),
+('b18', 'Animal Farm', 112, now(), 'g1'),
+('b19', 'Kafka on the Shore', 467, now(), 'g5'),
+('b20', 'Norwegian Wood', 296, now(), 'g4'),
+('b21', 'The Silmarillion', 365, now(), 'g2'),
+('b22', 'I, Robot', 224, now(), 'g1'),
+('b23', 'The Stand', 823, now(), 'g7'),
+('b24', 'Misery', 420, now(), 'g7'),
+('b25', 'Carrie', 199, now(), 'g7'),
+('b26', 'Emma', 474, now(), 'g4'),
+('b27', 'Sense and Sensibility', 409, now(), 'g4'),
+('b28', 'Fahrenheit 451', 194, now(), 'g1'),
+('b29', 'Brave New World', 288, now(), 'g1'),
+('b30', 'The Road', 287, now(), 'g5'),
+('b31', 'The Alchemist', 208, now(), 'g10'),
+('b32', 'Good Omens', 412, now(), 'g2'),
+('b33', 'Neverwhere', 370, now(), 'g2'),
+('b34', 'Oryx and Crake', 376, now(), 'g1'),
+('b35', 'The Testaments', 419, now(), 'g4'),
+('b36', 'The Martian', 369, now(), 'g1'),
+('b37', 'Dune', 604, now(), 'g1'),
+('b38', 'Do Androids Dream of Electric Sheep?', 210, now(), 'g1'),
+('b39', 'It', 1138, now(), 'g7'),
+('b40', 'The Green Mile', 536, now(), 'g7'),
+('b41', 'A Game of Thrones', 694, now(), 'g2'),
+('b42', 'A Clash of Kings', 768, now(), 'g2'),
+('b43', 'A Storm of Swords', 973, now(), 'g2'),
+('b44', 'A Feast for Crows', 753, now(), 'g2'),
+('b45', 'A Dance with Dragons', 1056, now(), 'g2'),
+('b46', 'The Great Gatsby', 180, now(), 'g5'),
+('b47', 'To Kill a Mockingbird', 281, now(), 'g5'),
+('b48', 'Sapiens: A Brief History of Humankind', 498, now(), 'g8'),
+('b49', 'Educated', 352, now(), 'g9'),
+('b50', 'Meditations', 254, now(), 'g10');
+
+-- Author-Book Junctions
+insert into library.authorbookjunction (authorId, bookId) values
+('a1', 'b1'),
+('a2', 'b2'),
+('a3', 'b3'),
+('a4', 'b4'),
+('a5', 'b5'),
+('a6', 'b6'),
+('a7', 'b7'),
+('a8', 'b8'),
+('a9', 'b9'),
+('a10', 'b10'),
+('a11', 'b11'),
+('a12', 'b12'),
+('a12', 'b13'),
+('a13', 'b14'),
+('a13', 'b15'),
+('a13', 'b16'),
+('a14', 'b17'),
+('a4', 'b18'),
+('a15', 'b19'),
+('a15', 'b20'),
+('a8', 'b21'),
+('a1', 'b22'),
+('a6', 'b23'),
+('a6', 'b24'),
+('a6', 'b25'),
+('a5', 'b26'),
+('a5', 'b27'),
+('a4', 'b28'),
+('a4', 'b29'),
+('a7', 'b30'),
+('a10', 'b34'),
+('a10', 'b35'),
+('a9', 'b32'),
+('a9', 'b33'),
+('a9', 'b9'),  -- co-author repeat
+('a11', 'b37'),
+('a1', 'b36'),
+('a1', 'b38'),
+('a6', 'b39'),
+('a6', 'b40'),
+('a8', 'b41'),
+('a8', 'b42'),
+('a8', 'b43'),
+('a8', 'b44'),
+('a8', 'b45'),
+('a7', 'b46'),
+('a7', 'b47'),
+('a10', 'b48'),
+('a10', 'b49'),
+('a10', 'b50')

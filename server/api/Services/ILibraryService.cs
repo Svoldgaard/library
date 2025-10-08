@@ -1,10 +1,9 @@
-
-
 using api.DTOS.Request;
+using efscaffold.Entities;
 
 public interface ILibraryService
 {
-    Task<List<BookDto>> GetBooks();
+    Task<List<Book>> GetBooks(GetBookRequestDto dto);
     Task<List<AuthorDto>> GetAuthors();
     Task<List<GenreDto>> GetGenres();
     

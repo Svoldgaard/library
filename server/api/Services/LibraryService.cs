@@ -6,13 +6,26 @@ using Microsoft.EntityFrameworkCore;
 
 public class LibraryService(MyDbContext ctx) : ILibraryService
 {
-    public Task<List<BookDto>> GetBooks()
+    public async Task<List<Book>> GetBooks(GetBookRequestDto dto)
     {
-        return ctx.Books
-            .Include(b => b.Authors) // load authors
-            .Include(b => b.Genre)   // load genre
-            .Select(b => new BookDto(b))
-            .ToListAsync();
+        IQueryable<Book> query = ctx.Books
+            .Include(b => b.Authors)
+            .Include(b => b.Genre);
+
+        if (dto.Ordering == BookOrderingOptions.Name)
+        {
+            query = query.OrderBy(a => a.Pages);
+        } 
+        else if (dto.Ordering == BookOrderingOptions.NumberOfBooksPublished)
+            query = query.OrderByDescending(a => a.Pages);
+        
+        //Chunking / pagination
+        query = query.Skip(dto.Skip).Take(dto.Take);
+        
+        //return som POJO
+        var list = await query.ToListAsync();
+
+        return list;
     }
 
     public Task<List<AuthorDto>> GetAuthors()

@@ -161,7 +161,7 @@ button {
     background: #f8f9fb;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     animation: fadeInUp 0.3s ease both;
 }
 

@@ -17,6 +17,55 @@ export class LibraryClient {
         this.baseUrl = baseUrl ?? "";
     }
 
+    getBooks(skip: number | undefined, take: number | undefined, ordering: BookOrderingOptions | undefined, descending: boolean | undefined): Promise<Book[]> {
+        let url_ = this.baseUrl + "/GetBooks?";
+        if (skip === null)
+            throw new globalThis.Error("The parameter 'skip' cannot be null.");
+        else if (skip !== undefined)
+            url_ += "Skip=" + encodeURIComponent("" + skip) + "&";
+        if (take === null)
+            throw new globalThis.Error("The parameter 'take' cannot be null.");
+        else if (take !== undefined)
+            url_ += "Take=" + encodeURIComponent("" + take) + "&";
+        if (ordering === null)
+            throw new globalThis.Error("The parameter 'ordering' cannot be null.");
+        else if (ordering !== undefined)
+            url_ += "Ordering=" + encodeURIComponent("" + ordering) + "&";
+        if (descending === null)
+            throw new globalThis.Error("The parameter 'descending' cannot be null.");
+        else if (descending !== undefined)
+            url_ += "Descending=" + encodeURIComponent("" + descending) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetBooks(_response);
+        });
+    }
+
+    protected processGetBooks(response: Response): Promise<Book[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Book[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Book[]>(null as any);
+    }
+
     getAuthors(): Promise<AuthorDto[]> {
         let url_ = this.baseUrl + "/GetAuthors";
         url_ = url_.replace(/[?&]$/, "");
@@ -48,39 +97,6 @@ export class LibraryClient {
             });
         }
         return Promise.resolve<AuthorDto[]>(null as any);
-    }
-
-    getBooks(): Promise<BookDto[]> {
-        let url_ = this.baseUrl + "/GetBooks";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "application/json"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetBooks(_response);
-        });
-    }
-
-    protected processGetBooks(response: Response): Promise<BookDto[]> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BookDto[];
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<BookDto[]>(null as any);
     }
 
     getGenres(): Promise<GenreDto[]> {
@@ -227,6 +243,32 @@ export class LibraryClient {
         return Promise.resolve<BookDto>(null as any);
     }
 }
+
+export interface Book {
+    id: string;
+    title: string;
+    pages: number;
+    createdat: string | undefined;
+    genreid: string | undefined;
+    genre: Genre | undefined;
+    authors: Author[];
+}
+
+export interface Genre {
+    id: string;
+    name: string;
+    createdat: string | undefined;
+    books: Book[];
+}
+
+export interface Author {
+    id: string;
+    name: string;
+    createdat: string | undefined;
+    books: Book[];
+}
+
+export type BookOrderingOptions = 0 | 1;
 
 export interface AuthorDto {
     id: string;

@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { type BookDto, type AuthorDto, type GenreDto, type UpdateBookDtoRequest } from "./generated-client.ts";
-import { libraryApi } from "./BaseUrl.ts";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
+import {type AuthorDto, type BookDto, type GenreDto, type UpdateBookDtoRequest} from "./generated-client.ts";
+import {libraryApi} from "./BaseUrl.ts";
 
 function EditBookPage() {
-    const { bookId } = useParams<{ bookId: string }>();
+    const {bookId} = useParams<{ bookId: string }>();
     const navigate = useNavigate();
 
     const [book, setBook] = useState<BookDto | null>(null);

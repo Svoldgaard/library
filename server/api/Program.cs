@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using api;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,10 @@ public class Program
         {
             options.UseNpgsql(services.GetRequiredService<AppOptions>().Db);
         });
-        services.AddControllers();
+        services.AddControllers().AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        });
         services.AddOpenApiDocument();
         //services.AddCors();
         services.AddCors(options =>
@@ -34,7 +38,7 @@ public class Program
             options.AddPolicy("AllowClient", policy =>
             {
                 policy.WithOrigins(
-                        "http://localhost:5174",
+                        "http://localhost:5173",
                         "https://libraryclient.fly.dev") 
                     .AllowAnyHeader()
                     .AllowAnyMethod();

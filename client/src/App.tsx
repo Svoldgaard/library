@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 import LibraryPage from './LibraryPage.tsx'
 import EditBookPage from './EditBookPage.tsx'
 
@@ -6,8 +6,8 @@ import EditBookPage from './EditBookPage.tsx'
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<LibraryPage />} />
-            <Route path="/edit/:bookId" element={<EditBookPage />} />
+            <Route path="/" element={<LibraryPage/>}/>
+            <Route path="/edit/:bookId" element={<EditBookPage/>}/>
         </Routes>
     )
 }
