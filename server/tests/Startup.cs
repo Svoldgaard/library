@@ -19,7 +19,6 @@ public class Startup
         {
             var postgreSqlContainer = new PostgreSqlBuilder().Build();
             postgreSqlContainer.StartAsync().GetAwaiter().GetResult();
-
             var connectionString = postgreSqlContainer.GetConnectionString();
             var options = new DbContextOptionsBuilder<MyDbContext>()
                 .UseNpgsql(connectionString)
@@ -29,5 +28,7 @@ public class Startup
             ctx.Database.EnsureCreated(); 
             return ctx;
         });
+        services.RemoveAll(typeof(ISeeder));
+        services.AddScoped<ISeeder, seeder>();
     }
 }

@@ -2,15 +2,23 @@
 
 using api.DTOS.Request;
 using efscaffold.Entities;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-public class LibraryController (ILibraryService libraryService) : ControllerBase
+public class LibraryController (ILibraryService libraryService, MyDbContext ctx) : ControllerBase
 {
     
-    [HttpGet(nameof(GetBooks))]
-    public async Task<List<Book>> GetBooks(GetBookRequestDto dto)
+    [HttpPost(nameof(GetBooks))]
+    public async Task<List<Book>> GetBooks([FromBody]GetBookRequestDto dto)
     {
         return await libraryService.GetBooks(dto);
+    }
+
+    [HttpGet(nameof(GetBooksDto))]
+    public async Task<List<BookDto>> GetBooksDto()
+    {
+        return await libraryService.GetBooksDto();
     }
     
     [Route(nameof(GetAuthors))]

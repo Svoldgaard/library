@@ -8,7 +8,6 @@ public class Program
 {
     public static void ConfigureServices(IServiceCollection services)
     {
-
         services.AddSingleton<AppOptions>(provider =>
         {
             var configuration = provider.GetRequiredService<IConfiguration>();
@@ -23,42 +22,47 @@ public class Program
 
             return appOptions;
         });
+
         services.AddDbContext<MyDbContext>((services, options) =>
         {
             options.UseNpgsql(services.GetRequiredService<AppOptions>().Db);
         });
+
         services.AddControllers().AddJsonOptions(opts =>
         {
-            opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            opts.JsonSerializerOptions.ReferenceHandler = null;
+            opts.JsonSerializerOptions.WriteIndented = true; // optional, for readability
         });
+
+
         services.AddOpenApiDocument();
-        //services.AddCors();
+
         services.AddCors(options =>
         {
             options.AddPolicy("AllowClient", policy =>
             {
                 policy.WithOrigins(
                         "http://localhost:5173",
-                        "https://libraryclient.fly.dev") 
+                        "https://libraryclient.fly.dev")
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             });
         });
+
         services.AddScoped<ILibraryService, LibraryService>();
         services.AddScoped<ISeeder, Seeder>();
-        
     }
 
-    public static void Main()
+    public static async Task Main()
     {
         var builder = WebApplication.CreateBuilder();
         builder.Configuration.AddEnvironmentVariables();
         ConfigureServices(builder.Services);
         var app = builder.Build();
 
-
         var appOptions = app.Services.GetRequiredService<AppOptions>();
         Validator.ValidateObject(appOptions, new ValidationContext(appOptions), true);
+
         app.UseExceptionHandler("/error");
         app.Map("/error", (HttpContext httpContext) =>
         {
@@ -70,15 +74,19 @@ public class Program
             }
             return Results.Problem("An unexpected error occurred.");
         });
+
         app.UseOpenApi();
         app.UseSwaggerUi();
         app.UseRouting();
         app.UseCors("AllowClient");
         app.UseAuthorization();
         app.MapControllers();
-        app.GenerateApiClientsFromOpenApi("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
+        
+        if (app.Environment.IsDevelopment())
+        {
+            await app.GenerateApiClientsFromOpenApi("/../../client/src/generated-client.ts");
+        }
+
         app.Run();
-
     }
-}    
-
+}

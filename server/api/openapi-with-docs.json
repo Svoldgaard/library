@@ -7,47 +7,23 @@
   },
   "paths": {
     "/GetBooks": {
-      "get": {
+      "post": {
         "tags": [
           "Library"
         ],
         "operationId": "Library_GetBooks",
-        "parameters": [
-          {
-            "name": "Skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetBookRequestDto"
+              }
+            }
           },
-          {
-            "name": "Take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 2
-          },
-          {
-            "name": "Ordering",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/BookOrderingOptions"
-            },
-            "x-position": 3
-          },
-          {
-            "name": "Descending",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            },
-            "x-position": 4
-          }
-        ],
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -57,6 +33,29 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/Book"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/GetBooksDto": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "Library_GetBooksDto",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookDto"
                   }
                 }
               }
@@ -293,6 +292,26 @@
           }
         }
       },
+      "GetBookRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "skip": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "take": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ordering": {
+            "$ref": "#/components/schemas/BookOrderingOptions"
+          },
+          "descending": {
+            "type": "boolean"
+          }
+        }
+      },
       "BookOrderingOptions": {
         "type": "integer",
         "description": "",
@@ -320,29 +339,6 @@
           0,
           1
         ]
-      },
-      "AuthorDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createdat": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "books": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BookDto"
-            }
-          }
-        }
       },
       "BookDto": {
         "type": "object",
@@ -402,6 +398,29 @@
             "type": "array",
             "items": {
               "type": "string"
+            }
+          }
+        }
+      },
+      "AuthorDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdat": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookDto"
             }
           }
         }

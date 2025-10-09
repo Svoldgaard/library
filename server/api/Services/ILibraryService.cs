@@ -4,6 +4,7 @@ using efscaffold.Entities;
 public interface ILibraryService
 {
     Task<List<Book>> GetBooks(GetBookRequestDto dto);
+    Task<List<BookDto>> GetBooksDto();
     Task<List<AuthorDto>> GetAuthors();
     Task<List<GenreDto>> GetGenres();
     

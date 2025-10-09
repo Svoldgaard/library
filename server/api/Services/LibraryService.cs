@@ -28,6 +28,15 @@ public class LibraryService(MyDbContext ctx) : ILibraryService
         return list;
     }
 
+    public async Task<List<BookDto>> GetBooksDto()
+    {
+        return await ctx.Books
+            .Include(b => b.Authors) // load authors
+            .Include(b => b.Genre)   // load genre
+            .Select(b => new BookDto(b))
+            .ToListAsync();
+    }
+
     public Task<List<AuthorDto>> GetAuthors()
     {
         return ctx.Authors.Select(a => new AuthorDto(a)).ToListAsync();

@@ -1,17 +1,18 @@
 import './App.css';
 import { useEffect, useState } from "react";
-import { type AuthorDto, type Book, type Genre } from "./generated-client.ts";
+import {type AuthorDto, type BookDto, type GenreDto} from "./generated-client.ts";
 import { libraryApi } from "./BaseUrl.ts";
 import { useNavigate } from "react-router-dom";
 
 interface BookRow {
-    book: Book;
+    book: BookDto;
     authors: AuthorDto[];
-    genre: Genre | null;
+    genre: GenreDto | null;
 }
 
-function LibraryPage() {
+export function LibraryPage() {
     const [, setAuthors] = useState<AuthorDto[]>([]);
+    const [, setBooks] = useState<BookDto[]>([]);
     const [rows, setRows] = useState<BookRow[]>([]);
     const [selectedBook, setSelectedBook] = useState<BookRow | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,30 +24,34 @@ function LibraryPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const skip = (currentPage - 1) * rowsPerPage;
-                const take = rowsPerPage;
-
                 const [authorsRes, booksRes] = await Promise.all([
                     libraryApi.getAuthors(),
-                    libraryApi.getBooks(skip, take, /* ordering */ 0, /* descending */ false)
+                    libraryApi.getBooksDto()
                 ]);
 
-                setAuthors(authorsRes ?? []);
+                // unwrap $values if present
+                const authors: AuthorDto[] = Array.isArray(authorsRes)
+                    ? authorsRes
+                    : (authorsRes as any)?.$values ?? [];
 
-
-                const booksArray = Array.isArray(booksRes)
+                const books: BookDto[] = Array.isArray(booksRes)
                     ? booksRes
-                    : booksRes?.books
-                        ? booksRes.books
-                        : [];
+                    : (booksRes as any)?.$values ?? [];
 
-                const bookRows: BookRow[] = booksArray.map(book => ({
-                    book,
-                    authors: (authorsRes ?? []).filter(a =>
-                        book.authors?.some(author => author.id === a.id)
-                    ),
-                    genre: book.genre ?? null
-                }));
+                setAuthors(authors);
+                setBooks(books);
+
+                const bookRows: BookRow[] = books.map((book: BookDto) => {
+                    const authorIds: string[] = Array.isArray(book.authorsIds)
+                        ? book.authorsIds
+                        : (book.authorsIds as any)?.$values ?? [];
+
+                    return {
+                        book,
+                        authors: authors.filter(a => authorIds.includes(a.id)),
+                        genre: book.genre ?? null
+                    };
+                });
 
                 setRows(bookRows);
             } catch (err) {
@@ -55,7 +60,10 @@ function LibraryPage() {
         };
 
         fetchData();
-    }, [currentPage]); // re-fetch when page changes
+    }, [currentPage]);
+
+
+
 
     const handleUpdate = () => {
         if (selectedBook) {
@@ -106,11 +114,15 @@ function LibraryPage() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, rows]);
+    }, [searchTerm]);
 
     const handleRowClick = (row: BookRow) => {
         setSelectedBook(row);
     };
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+    const totalBooks = filteredRows.length;
 
     return (
         <div className="app-container">
@@ -158,6 +170,11 @@ function LibraryPage() {
                             <button onClick={handlePrevPage} disabled={currentPage === 1}>
                                 Previous
                             </button>
+
+                            <span>
+                                Showing {startIndex}-{endIndex} of {totalBooks} books
+                            </span>
+
                             <button onClick={handleNextPage} disabled={currentPage === totalPages}>
                                 Next
                             </button>
@@ -184,4 +201,4 @@ function LibraryPage() {
     );
 }
 
-export default LibraryPage;
+
